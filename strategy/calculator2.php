@@ -1,5 +1,5 @@
 <?php
-//Basic Implementation of the Strategy Pattern
+//Basic Implementation of the Strategy Pattern and additional things
 interface OperationInterface{
     public function doOperation($a, $b);
 }
@@ -18,6 +18,13 @@ class SubstractionStrategy implements OperationInterface{
     }
 }
 
+class MultiplicationStrategy implements OperationInterface{
+
+    public function doOperation($a, $b){
+        return $a * $b;
+    }
+}
+
 class Calculator{
     protected $operation;
 
@@ -33,10 +40,24 @@ class Calculator{
     public function setOperation(OperationInterface $operation){
         $this->operation = $operation;
     }
+
+    public function __call($method, $arguments){
+        // $method = addition
+        $classname = ucfirst($method) . 'Strategy';
+
+        // $arguments = [5, 3]
+        list($a, $b) = $arguments;
+
+        $this->setOperation(new $classname);
+
+        return $this->execute($a, $b);
+    }
 }
 
 $calculator = new Calculator(new AdditionStrategy());
-$calculator->setOperation(new SubstractionStrategy());
-$result = $calculator->execute(5, 3);
+
+// $result = $calculator->addition(5, 3);
+// $result = $calculator->substraction(5, 3);
+$result = $calculator->multiplication(5, 3);
 
 var_dump($result);
